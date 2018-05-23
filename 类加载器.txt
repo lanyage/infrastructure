@@ -1,0 +1,29 @@
+java和c,c++不同，java程序并不是一个可执行的程序，而是由许多独立的类文件组成的。这些类文件不是全部装入内存，而是根据程序需要逐渐载入。
+ClassLoader是JVM实现的一部分，包括bootstrap classloader启动类加载器,ClassLoader在JVM运行时加载核心API以满足java程序最基本的需求，
+其中就包括用户自定义的CLassLoader，包括两个：ExtClassLoader，它的作用是用来加载java扩展的api，也就是lib/ext中的类，第二个是AppClassLoader,它用来
+加载用户机器上ClassPath设置目录中的Class，通常在没有指定CLassLoader的情况下，程序员自定义的类就由该ClassLoader进行加载。
+
+ClassLoader加载流程
+ 程序运行-虚拟机启动-运行bootstrap classloader来加载java核心api，etxclassloader和appclassloader也是在此时被加载-调用extclassloader加载扩展api
+ ，最后appclassloader加载classpath目录下定义的class，这就是一个程序最基本的加载流程。
+ 
+ 一个类在加载的时候使用了父类委托模式，原因1:避免重复加载，当父类已经加载了该类的时候，就没有必要子类classloader在加载一次。原因2:考虑到安全因素，如果不这么
+ 做的话，那么随时可以使用自定义的String来动态替换java核心api中的定义类型，这样会存在非常大的安全隐患，因为String类在虚拟机启动的时候已经被加载，那么用户
+ 自定义的类就不会再被加载。
+ 
+ 重要方法：
+ 1.Class loadClass(String name, boolean resolve)
+    该方法是ClassLoader的入口点,name是需要加载的类的全类名，resolve告诉方法是否需要解析类，并不是总要解析,如果JVM只需要知道该类是否存在或者找出该类的
+    超类,那么就不需要解析。
+ 2.final defineClass()
+    该方法接受原始字节组成的数组，并且将他们转换成Class对象
+ 3.findSystemClass()
+    该方法从本地文件系统寻找类文件，如果存在就使用defineClass将原始字节转换成为Class对象，以将文件转换成类。
+ 4.resolveClass()
+   可以不完全地装入类，也可以完全地装入类，当编写我们自己的loadClass时，可以调用resolveClass，这取决于loadClass的resolve参数值。
+ 5.findLoadedClass()
+   loadedClass充当一个缓存，当请求loadClass装入类时，它调用该方法来查看ClassLoader是否已经装入这个类，这样可以避免重新装入已存在类所造成的麻烦。
+ 6.findClass()
+ 7.getSystemClassLoader()
+ 8.Class.forName()
+    该方法和和ClassLoader的loadClass
