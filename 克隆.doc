@@ -1,0 +1,7 @@
+Object.clone()方法在调用的时候会检查对象所属类是否实现了Cloneable接口
+x.clone() != x
+x.getClass().getName() == x.clone().getClass()
+x.equals(ex.clone())
+如果没有实现Cloneable接口,就会抛出CloneNotSupportedException的异常。
+
+Object中默认的实现是一个浅复制，也就是表面复制，如果需要实现深层次复制，必须对类中可变域生成新的实例。
