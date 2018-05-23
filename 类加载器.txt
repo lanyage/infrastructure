@@ -1,15 +1,10 @@
 java和c,c++不同，java程序并不是一个可执行的程序，而是由许多独立的类文件组成的。这些类文件不是全部装入内存，而是根据程序需要逐渐载入。
-ClassLoader是JVM实现的一部分，包括bootstrap classloader启动类加载器,ClassLoader在JVM运行时加载核心API以满足java程序最基本的需求，
-其中就包括用户自定义的CLassLoader，包括两个：ExtClassLoader，它的作用是用来加载java扩展的api，也就是lib/ext中的类，第二个是AppClassLoader,它用来
-加载用户机器上ClassPath设置目录中的Class，通常在没有指定CLassLoader的情况下，程序员自定义的类就由该ClassLoader进行加载。
+ClassLoader是JVM实现的一部分，包括bootstrap classloader启动类加载器,ClassLoader在JVM运行时加载核心API以满足java程序最基本的需求，其中就包括用户自定义的CLassLoader。
+用户自定义的ClassLoader包括两个：ExtClassLoader，它的作用是用来加载java扩展的api，也就是lib/ext中的类，第二个是AppClassLoader,它用来加载用户机器上ClassPath设置目录中的Class，通常在没有指定CLassLoader的情况下，程序员自定义的类就由该ClassLoader进行加载。
 
-ClassLoader加载流程
- 程序运行-虚拟机启动-运行bootstrap classloader来加载java核心api，etxclassloader和appclassloader也是在此时被加载-调用extclassloader加载扩展api
- ，最后appclassloader加载classpath目录下定义的class，这就是一个程序最基本的加载流程。
+    ClassLoader加载流程:程序运行-虚拟机启动-运行bootstrap classloader来加载java核心api，etxclassloader和appclassloader也是在此时被加载-调用extclassloader加载扩展api，最后appclassloader加载classpath目录下定义的class，这就是一个程序最基本的加载流程。
  
- 一个类在加载的时候使用了父类委托模式，原因1:避免重复加载，当父类已经加载了该类的时候，就没有必要子类classloader在加载一次。原因2:考虑到安全因素，如果不这么
- 做的话，那么随时可以使用自定义的String来动态替换java核心api中的定义类型，这样会存在非常大的安全隐患，因为String类在虚拟机启动的时候已经被加载，那么用户
- 自定义的类就不会再被加载。
+    一个类在加载的时候使用了父类委托模式，原因1:避免重复加载，当父类已经加载了该类的时候，就没有必要子类classloader在加载一次。原因2:考虑到安全因素，如果不这么做的话，那么随时可以使用自定义的String来动态替换java核心api中的定义类型，这样会存在非常大的安全隐患，因为String类在虚拟机启动的时候已经被加载，那么用户自定义的类就不会再被加载。
  
  重要方法：
  1.Class loadClass(String name, boolean resolve)
@@ -26,4 +21,4 @@ ClassLoader加载流程
  6.findClass()
  7.getSystemClassLoader()
  8.Class.forName()
-    该方法和和ClassLoader的loadClass
+    该方法和和ClassLoader的loadClass目的一样，都是用来加载class的,但是两者有所区别。Class.forName()调用Class.forName(name,initialize,loader),第二个参数用于设置加载类的时候是否连接该类，true就是连接，否则就不连接，JVM在加载类的时候分为装载、连接和初始化三个步骤。连接又分为3步，第一步是验证class是否符合规格。第二部是准备，就是为类对象分配内存的同时设置默认初始化值。第三部就是解释，而这部是可选的。解释就是指根据类中的符号引用查找相应的实体，再把符号引用替换成一个直接引用的过程。因此loadClass和forName的区别是前者不会初始化该类，而后者会会将Class进行解释和初始化。
