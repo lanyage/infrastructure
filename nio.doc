@@ -61,7 +61,27 @@
   放在一个数组中并使用散射读取来读取它们时，标题和正文将在两个缓冲区之间整齐划分。
   
   文件锁定
- 
+  文件锁定并非总是用于保护数据。你可能暂时锁定一个文件，以确保特定的写入操作是自动进行的。而不收其他程序的干扰。
+  大多数操作系统都系统文件系统锁。
+  FileLock lock = fc.lock(start,end,false);
+  lock.release();//释放锁定
+  
+  异步IO
+  异步IO是一种无阻塞的读取数据的方法，通常情况下，当您的代码发起read调用时，代码会阻塞，直到有数据被读取。同样，
+  一个write调用会阻塞，知道数据可以写入。
+  另一方面，异步IO不回阻塞，相反，您注册您对特定IO事件的兴趣，异步的优点之一是它可以让您在同一事件从很多输入和输出
+  进行IO操作，同步程序通常不得不求助于轮训，或创建许多线程来处理大量连接。使用异步IO，您可以在任意数量的通道上侦听IO
+  事件，而无需轮训并且无需额外的线程。
+  异步IO中的对象成为Selector，是您在各种IO事件中注册您感兴趣的地方，它是告诉您这些事件何时发生的对象。
+  Selector selector = Selector.open();
+  然后注册各种通道对象的方法，以注册对这些对象内发生IO事件的兴趣，register的第一个参数始终是Selector
+  ServerSocketChannel ssc = ServerSocketChannel.open();
+  ssc.configureBlocking(false);//设置非阻塞,我们必须在我们使用的每个socket通道上调用此方法，否则异步无法工作
+  ServerSocket ss = ssc.socket();
+  InetSocketAddress address = new InetSocketAddress(posts[i]);
+  ss.bind(address);
+  
+  Select
   
   
   
