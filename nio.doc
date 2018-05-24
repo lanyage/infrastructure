@@ -1,0 +1,50 @@
+1.I/O是单个字节的移动，一次一个。
+2.NIO则是将I/O提升到了块的水平，原始I/O和NIO的最大区块是在于数据如何打包和传输。原始IO处理数据流，而NIO则处理数据块。
+3.NIO将最耗时的IO操作移回到了操作系统中，从而可以大大的提升速度。但是NIO的操作块没有操作流来的优雅和简洁。
+4.Channels和缓冲区是NIO的中心对象。通道类则类似于流，数据去任何地方都要经过一个Channel对象。
+5.Buffer本质上是一个容器对象-数组，发送到频道的所有数据都必须首先放入缓冲区。从Channel读取的任何数据也都要经过缓冲区。
+6.缓冲区提供对数据的结构化访问，并且还跟踪系统的读写功能。
+7.常用的缓冲区有ByteBuffer,允许在底层数组上进行get和set操作。
+  还有ByteBuffer,CharBuffer,ShortBuffer,IntBuffer,LongBuffer,FloatBuffer,DoubleBuffer
+  但是ByteBuffer是最独特的。ChunkIn and ChunkOut是NIO的核心。
+8.Channel是双向的，而流是单向的。
+
+9.实战：
+  从文件中读取。
+  1.创建FileInputStream fis = new FileInputStream("file.txt");
+  2.FileChannel fc = fis.getChannel();
+  3.创建缓冲区:ByteBuffer buffer = ByteBuffer.allocate(1024);
+  4.fc.read(buffer);
+  写入文件。
+  1.FileChannel channel = fileOutputStream.getChannel();
+  2.ByteBuffer buffer = ByteBuffer.allocate(1024);
+  3.byte[] message = "THIS IS A NEW LINE!".getBytes();
+  4.for (int i = 0; i < message.length; i++) {
+       buffer.put(message[i]);
+    }
+  5.buffer.flip();//准备缓冲区以将新都区的数据写入另一个Channel
+  6.channel.write(buffer);
+10.状态变量
+  postion limit capacity
+  position表示游标，如果你已经读了3个字节,那么position将指向第4个字节。
+  limit表示剩余的数据量。
+  capacity表示可以存储在其中的数据的最大量。
+  
+11.NIO高级部分
+  将数组包装成为缓冲区,不过要特别小心
+  byte[] array = new byte[1024];
+  ByteBuffer.wrap(array);
+  
+  缓冲区切片
+  buffer.position(3)
+  buffer.limit(7)
+  ByteBuffer slice = buffer.slice();
+  
+  只读缓冲区
+  asReadOnlyBuffer()返回新缓冲区，但是是只读的,并且不能将只读缓冲区转换为可写缓冲区
+  
+  直接缓冲区
+  使用内存映射文件创建直接缓冲区，这种方法比普通的基于流或Channel的IO速度快得多
+  这种技术并不是将整个文件读入内存，只有实际读取或写入的文件部分被映射到内存。
+  尽管创建起来相当简单，但是写入内存映射文件可能会很危险。通过修改数组中单个元素的简单操作，您可以
+  
