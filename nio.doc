@@ -80,9 +80,27 @@
   ServerSocket ss = ssc.socket();
   InetSocketAddress address = new InetSocketAddress(posts[i]);
   ss.bind(address);
-  
-  Select
-  
+ 
+  SelectionKey key = ssc.register(selector, SelectionKey.OP_ACCEPT);
+  现在我们注册了一些IO事件，我们进入了主循环。几乎每个Selector使用内部循环的程序都非常像这样：
+  int num = selector.select();
+  Set selectedKeys = selector.selectedKeys();
+  Iterator it = selectefKeys.iterator();
+  while(it.hasNext()){ 
+    SelectionKey key = (SelectionKey)it.next();
+    //Deal with I/O event
+  }
+  //使用it.remove来删除已处理的SelectionKey
+  当数据从其中一个套接字到达时，它会出发一个IO事件。这会导致调用Selector.select()在我们的主循环中返回
+  一个或多个IO事件。这一次SelectionKey会被标记为OP_READ
+ 
+ 编码和解码
+ Charset latin1 = Charset.forName("ISO-8859-1)
+ CharsetDecoder decoder = latin1.newDecoder();
+ CharsetEncoder encoder = latin1.newEncoder();
+ CharBuffer cb = decoder.decode(inputdata);
+ ByteBuffer outputData = encoder.encode(cb);
+ 
   
   
   
