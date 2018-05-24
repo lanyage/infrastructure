@@ -1,0 +1,83 @@
+package test;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
+/**
+ * Created by lanyage on 2018/5/24.
+ */
+public class IOTest {
+
+    private String fileName = "/Users/lanyage/IdeaProjects/mybatis/src/main/java/test/test.txt";
+
+    /**
+     * Normal FileInputStream file-reading
+     */
+    public void testInputStream() {
+        File file = new File(fileName);
+        try {
+            FileInputStream inputStream = new FileInputStream(file);
+            byte[] buf = new byte[3];
+            int i = inputStream.read(buf);
+            System.out.println(new String(buf, 0, i, "utf-8"));
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * File-reading with channel and buffer
+     */
+    public void testNIOReading() {
+        File file = new File(fileName);
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            FileChannel channel = fileInputStream.getChannel();
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            int i = channel.read(buffer);
+            System.out.println(new String(buffer.array(), 0, i));
+            channel.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * File-writing with channel and buffer
+     */
+    public void testNIOWriting() {
+        File file = new File(fileName);
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        FileChannel channel = fileOutputStream.getChannel();
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        byte[] message = "THIS IS A NEW LINE!".getBytes();
+        for (int i = 0; i < message.length; i++) {
+            buffer.put(message[i]);
+        }
+        buffer.flip();
+        try {
+            channel.write(buffer);
+            channel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        IOTest iot = new IOTest();
+        iot.testInputStream();
+        iot.testNIOReading();
+        iot.testNIOWriting();
+    }
+}
